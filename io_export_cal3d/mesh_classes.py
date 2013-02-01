@@ -95,7 +95,7 @@ class Map:
     
     
 	def to_cal3d_xml(self):
-		return "      <TEXCOORD>{0} {1}</TEXCOORD>\n".format(self.u, self.v)
+		return "      <TEXCOORD>{0:.5f} {1:.5f}</TEXCOORD>\n".format(self.u, self.v)
 
 		
 	def to_cal3d_binary(self, file):
@@ -151,11 +151,11 @@ class Vertex:
 		
 		s = "    <VERTEX ID=\"{0}\" NUMINFLUENCES=\"{1}\">\n".format(self.index,
 		                                                             len(self.influences))
-		s += "      <POS>{0} {1} {2}</POS>\n".format(self.loc[0],
+		s += "      <POS>{0:.5f} {1:.5f} {2:.5f}</POS>\n".format(self.loc[0],
 		                                             self.loc[1], 
 		                                             self.loc[2])
 
-		s += "      <NORM>{0} {1} {2}</NORM>\n".format(self.normal[0],
+		s += "      <NORM>{0:.5f} {1:.5f} {2:.5f}</NORM>\n".format(self.normal[0],
 		                                               self.normal[1],
 		                                               self.normal[2])
 

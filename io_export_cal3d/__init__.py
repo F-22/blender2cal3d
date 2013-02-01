@@ -102,21 +102,21 @@ class ExportCal3D(bpy.types.Operator, ExportHelper):
             items=(('binary', "Binary (.CSF)", "Export a binary skeleton"),
                    ('xml', "XML (.XSF)", "Export an xml skeleton"),
                    ),
-			default='binary'
+			default='xml'
             )
 	mesh_binary_bool = EnumProperty(
             name="Mesh Filetype",
             items=(('binary', "Binary (.CMF)", "Export a binary mesh"),
                    ('xml', "XML (.XMF)", "Export an xml mesh"),
                    ),
-			default='binary'
+			default='xml'
             )
 	animation_binary_bool = EnumProperty(
             name="Animation Filetype",
             items=(('binary', "Binary (.CAF)", "Export a binary animation"),
                    ('xml', "XML (.XAF)", "Export an xml animation"),
                    ),
-			default='binary'
+			default='xml'
             )
 	material_binary_bool = EnumProperty(
             name="Material Filetype",
@@ -166,7 +166,7 @@ class ExportCal3D(bpy.types.Operator, ExportHelper):
 					cal3d_skeleton = create_cal3d_skeleton(obj, obj.data,
 					                                       base_rotation.copy(),
 					                                       base_translation.copy(),
-					                                       base_scale, 900)
+					                                       base_scale, 910)
 		except Exception as e:
 			print("###### ERROR DURING ARMATURE EXPORT ######")
 			traceback.print_exc()
@@ -174,7 +174,7 @@ class ExportCal3D(bpy.types.Operator, ExportHelper):
 
 		# Export meshes and materials
 		try:
-			cal3d_materials = create_cal3d_materials(cal3d_dirname, self.imagepath_prefix, 900)
+			cal3d_materials = create_cal3d_materials(cal3d_dirname, self.imagepath_prefix, 910)
 
 			for obj in visible_objects:
 				if obj.type == "MESH" and obj.is_visible(context.scene):
@@ -183,8 +183,10 @@ class ExportCal3D(bpy.types.Operator, ExportHelper):
 														  cal3d_materials,
 														  base_rotation,
 														  base_translation,
-														  base_scale, 900,
-														  self.use_groups, False, armature_obj))
+														  base_scale, 910,
+														  self.use_groups, 
+														  False, 
+														  armature_obj))
 		except RuntimeError as e:
 			print("###### ERROR DURING MESH EXPORT ######")
 			print(e)

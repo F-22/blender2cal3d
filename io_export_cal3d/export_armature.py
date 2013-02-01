@@ -11,9 +11,9 @@ from .armature_classes import *
 def treat_bone(b, scale, parent, skeleton):
 	# skip bones that start with _
 	# also skips children of that bone so be careful
-	if len(b.name) == 0 or  b.name[0] == '_':
+	if len(b.name) == 0 or b.name[0] == '_':
 		return
-
+	print(b.name)
 	name = b.name
 	bone_matrix = b.matrix.copy()
 
@@ -40,7 +40,7 @@ def treat_bone(b, scale, parent, skeleton):
 	# purely a hack to make these bones show up in the Cal3D viewer 
 	# for debugging.  These "leaf" bones otherwise have
 	# no effect so they are not added by default.
-	add_leaf_bones = True
+	add_leaf_bones = False
 	if len(b.children) == 0 and add_leaf_bones:
 		tail = (b.tail - b.head) * scale
 		bone = Bone(skeleton, bone, name + "_leaf",
@@ -69,8 +69,8 @@ def create_cal3d_skeleton(arm_obj, arm_data,
 
 	scalematrix = Matrix()
 	scalematrix[0][0] = total_scale.x
-	scalematrix[1][1] = total_scale.y
-	scalematrix[2][2] = total_scale.z
+	scalematrix[1][1] = total_scale.z
+	scalematrix[2][2] = total_scale.y
 
 	for bone in arm_data.bones.values():
 		if not bone.parent and bone.name[0] != "_":

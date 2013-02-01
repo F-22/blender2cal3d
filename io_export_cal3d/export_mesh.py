@@ -77,11 +77,14 @@ def create_cal3d_mesh(scene, mesh_obj,
                       base_translation_orig,
                       base_scale,
                       xml_version,
-					  use_groups, use_envelopes, armature_obj):
+				  use_groups, use_envelopes, armature_obj):
 
 	mesh_matrix = mesh_obj.matrix_world.copy()
-
 	mesh_data = mesh_obj.to_mesh(scene, False, "PREVIEW")
+
+	# force blender generate tessfaces, they might not exist
+	mesh_data.update(calc_tessface=True)
+	
 	mesh_data.transform(mesh_matrix)
 
 	base_translation = base_translation_orig.copy()
@@ -95,7 +98,7 @@ def create_cal3d_mesh(scene, mesh_obj,
 
 	cal3d_mesh = Mesh(mesh_obj.name, xml_version)
 
-	faces = mesh_data.faces
+	faces = mesh_data.tessfaces
 
 	# currently 1 material per mesh
 
@@ -112,20 +115,25 @@ def create_cal3d_mesh(scene, mesh_obj,
 	                        cal3d_material_index)
 	cal3d_mesh.submeshes.append(cal3d_submesh)
 
+	print("num vertices: {0}".format(len(mesh_data.vertices)))
 	duplicate_index = len(mesh_data.vertices)
+	
+	max_influences_found = 0
 
-	for face in mesh_data.faces:
+	for face in mesh_data.tessfaces:
 		cal3d_vertex1 = None
 		cal3d_vertex2 = None
 		cal3d_vertex3 = None
 		cal3d_vertex4 = None
-
+		face_counter = 0
 		for vertex_index in face.vertices:
+			#print("face counter: {0}".format(face_counter))
+			face_counter = face_counter+1
 			duplicate = False
 			cal3d_vertex = None
 			uvs = []
 
-			for uv_texture in mesh_data.uv_textures:
+			for uv_texture in mesh_data.tessface_uv_textures:
 				if not cal3d_vertex1:
 					uvs.append(uv_texture.data[face.index].uv1.copy())
 				elif not cal3d_vertex2:
@@ -135,8 +143,8 @@ def create_cal3d_mesh(scene, mesh_obj,
 				elif not cal3d_vertex4:
 					uvs.append(uv_texture.data[face.index].uv4.copy())
 
-			for uv in uvs:
-				uv[1] = 1.0 - uv[1]
+#			for uv in uvs:
+#				uv[1] = 1.0 - uv[1]
 
 			
 			for cal3d_vertex_iter in cal3d_submesh.vertices:
@@ -174,23 +182,32 @@ def create_cal3d_mesh(scene, mesh_obj,
 				coord.rotate(total_rotation)
 
 				if duplicate:
+					vertex_index = duplicate_index
 					cal3d_vertex = Vertex(cal3d_submesh, duplicate_index,
 					                      coord, normal)
 					duplicate_index += 1
 
 				else:
-					cal3d_vertex = Vertex(cal3d_submesh, vertex_index,
+					cal3d_vertex = Vertex(cal3d_submesh,
+					                      vertex_index,
 					                      coord, normal)
 
 										  
 				cal3d_vertex.influences = get_vertex_influences(vertex,
-						                                        mesh_obj,
+						                                mesh_obj,
 				                                                cal3d_skeleton,
-																use_groups, use_envelopes, armature_obj)
+										use_groups, use_envelopes, armature_obj)
+				if (len(cal3d_vertex.influences) >= max_influences_found):
+					max_influences_found = len(cal3d_vertex.influences)
+					print("num influences {0}".format(len(cal3d_vertex.influences)))
 				for uv in uvs:
 					cal3d_vertex.maps.append(Map(uv[0], uv[1]))
 
-				cal3d_submesh.vertices.append(cal3d_vertex)
+				if (len(cal3d_submesh.vertices) <= vertex_index):
+					for i in range(len(cal3d_submesh.vertices),vertex_index+2):
+					#	print("padding vertex list for {0} with {1}".format(vertex_index,i))
+						cal3d_submesh.vertices.append(cal3d_vertex)
+				cal3d_submesh.vertices[vertex_index] = cal3d_vertex
 
 			if not cal3d_vertex1:
 				cal3d_vertex1 = cal3d_vertex
@@ -200,11 +217,13 @@ def create_cal3d_mesh(scene, mesh_obj,
 				cal3d_vertex3 = cal3d_vertex
 			elif not cal3d_vertex4:
 				cal3d_vertex4 = cal3d_vertex
-
+		#print("Face composition: {0} {1} {2}".format(cal3d_vertex1.index,cal3d_vertex2.index, cal3d_vertex3.index))
 		cal3d_face = Face(cal3d_submesh, cal3d_vertex1,
 		                  cal3d_vertex2, cal3d_vertex3,
 		                  cal3d_vertex4)
 		cal3d_submesh.faces.append(cal3d_face)
+	print("duplicate_index after: {0}".format(duplicate_index)  )
+	print("max influences found: {0}".format(max_influences_found) )
 
 	bpy.data.meshes.remove(mesh_data)
 

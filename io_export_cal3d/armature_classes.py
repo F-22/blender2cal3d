@@ -91,20 +91,20 @@ class Bone:
 		                                                                  self.name, 
 		                                                                  len(self.children))
 
-		s += "	<TRANSLATION>{0} {1} {2}</TRANSLATION>\n".format(self.loc[0],
+		s += "	<TRANSLATION>{0:.5f} {1:.5f} {2:.5f}</TRANSLATION>\n".format(self.loc[0],
 		                                                         self.loc[1],
 		                                                         self.loc[2])
 
-		s += "	<ROTATION>{0} {1} {2} {3}</ROTATION>\n".format(self.quat.inverted().x,
+		s += "	<ROTATION>{0:.5f} {1:.5f} {2:.5f} {3:.5f}</ROTATION>\n".format(self.quat.inverted().x,
 		                                                       self.quat.inverted().y,
 		                                                       self.quat.inverted().z,
 		                                                       self.quat.inverted().w)
 
-		s += "	<LOCALTRANSLATION>{0} {1} {2}</LOCALTRANSLATION>\n".format(self.lloc[0],
+		s += "	<LOCALTRANSLATION>{0:.5f} {1:.5f} {2:.5f}</LOCALTRANSLATION>\n".format(self.lloc[0],
 		                                                                   self.lloc[1],
 		                                                                   self.lloc[2])
 
-		s += "	<LOCALROTATION>{0} {1} {2} {3}</LOCALROTATION>\n".format(self.lquat.inverted().x,
+		s += "	<LOCALROTATION>{0:.5f} {1:.5f} {2:.5f} {3:.5f}</LOCALROTATION>\n".format(self.lquat.inverted().x,
 		                                                                 self.lquat.inverted().y,
 		                                                                 self.lquat.inverted().z,
 		                                                                 self.lquat.inverted().w)
